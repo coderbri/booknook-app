@@ -1,5 +1,36 @@
 # BookNook – Changelog
 
+## [ v0.3.0 ] – Model Setup: Signup Route
+**Release Date:** May 15, 2026
+
+### Authentication Overview
+Implemented **token-based authentication** using JWT. Rather than re-validating credentials on every request, the server issues a signed token containing the user's ID at login. The app stores this token and sends it with future requests to prove identity. The signup workflow is as follows:
+
+1. User fills out the signup form (username, email, password)
+2. Client-side validation ensures all fields meet requirements (valid email, minimum password length, etc.)
+3. On submit, the form data is sent to the server
+4. Server checks the database to ensure the email and username are not already taken
+5. If available, the server creates a new user account and hashes the password before saving
+6. Server generates a JWT (JSON Web Token) — a signed, encrypted digital ID tied to the user
+7. The token and basic account info are sent back to the app
+8. The app stores the token in **AsyncStorage** — React Native's built-in key-value storage for persisting small pieces of data on the device (similar to `localStorage` in the browser)
+9. The user is now authenticated and can access the app
+
+### ⠀Files Added
+- `src/models/User.js` — Mongoose schema for the user entity with `username`, `email`, `password`, and `profileImage` fields; includes a `pre("save")` middleware hook that automatically hashes the password using `bcryptjs` before storing it, so plain-text passwords are never written to the database
+- `src/models/` — New directory created within `backend/src/` to house all Mongoose models
+
+### ⠀Files Modified
+- `src/routes/authRoutes.js` — Replaced the placeholder `GET /register` test route with a fully implemented `POST /register` endpoint:
+  - Validates that all fields are present and meet minimum length requirements
+  - Checks the database for duplicate email or username before proceeding
+  - Generates a unique avatar via the ~[DiceBear Avataaars API](https://www.dicebear.com/)~ seeded with the username
+  - Saves the new user to the database and returns a JWT along with basic account info
+  - Added a `generateToken` helper that signs a JWT using `JWT_SECRET` from the environment, valid for 15 days
+  - Added `JWT_SECRET` to `.env `for token signing
+
+---
+
 ## [ v0.2.0 ] – Database Setup
 **Release Date:** May 14, 2026
 
