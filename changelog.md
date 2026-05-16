@@ -1,5 +1,20 @@
 # BookNook – Changelog
 
+## [ v0.3.1 ] – Signup Route: Bug Fixes & Postman Testing
+**Release Date:** May 16, 2026
+
+### Bug Fixes
+* `src/index.js` — Added the missing `express.json()` middleware so Express can parse incoming JSON request bodies; without it, `req.body` was always `undefined`, causing the register route to throw a destructuring error
+* `src/models/User.js` — Removed the `next` parameter from the `pre("save")` hook and replaced the early return with a plain return instead of `return next()`; Mongoose's `async` pre-hooks resolve automatically when the function returns, so passing `next` as a parameter was causing a `TypeError: next is not a function error at runtime`
+  * Also corrected `minLength` → `minlength` on the `password` field to match Mongoose's expected casing
+  * Added `{ timestamps: true }` to the schema options to automatically track `createdAt` and `updatedAt` on every document
+
+### Testing
+* Verified the `POST /api/auth/register` endpoint in Postman with a valid request body; confirmed a successful `201` response returning a signed JWT and the new user's account info (excluding the hashed password)
+* Verified error handling for invalid submissions (missing fields, short password, duplicate email/username)
+
+---
+
 ## [ v0.3.0 ] – Model Setup: Signup Route
 **Release Date:** May 15, 2026
 
