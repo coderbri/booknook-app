@@ -1,7 +1,7 @@
 /**
  * @file User.js
  * @description Mongoose schema and model configuration for the user entity,
- * including pre-save hooks for password hashing.
+ * including pre-save hooks for password hashing and instance methods for auth.
  */
 
 import mongoose from "mongoose";
@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+
 /**
  * Pre-save middleware hook to automatically hash passwords 
  * before saving a user document to the database.
@@ -42,6 +43,16 @@ userSchema.pre("save", async function () {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });
+
+
+/**
+ * Compares a provided plain-text password with the stored hased password.
+ * @param {string} userPassword – The plain-text password from the login request.
+ * @returns {Promise<boolean>} True if the passwords match, false otherwise.
+ */
+userSchema.methods.comparePassword = async function (userPassword) {
+    return await bcrypt.compare(userPassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;

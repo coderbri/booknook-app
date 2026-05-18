@@ -1,5 +1,34 @@
 # BookNook – Changelog
 
+## [ v0.4.0 ] – Login Route
+**Release Date:** May 18, 2026
+
+### Login Workflow
+The login process mirrors the signup flow but focuses on verifying an existing user's identity rather than creating a new one:
+1. User types their email and password into the login form
+2. The app validates that all required fields are filled out
+3. On tap of "Login", credentials are sent to the server
+4. The server queries the database for a user matching the provided email
+5. If found, the server compares the entered password against the stored hashed password
+6. If the passwords match, the server generates a JWT — a signed digital ID tied to the user's account
+7. The token and basic account info are sent back to the app
+8. The app stores the token on the device using AsyncStorage for session persistence
+9. The user is now logged in and can access the app
+
+### ⠀Files Modified
+- `src/models/User.js` — Added a `comparePassword` instance method to the schema that uses `bcrypt.compare` to securely check a plain-text password against the stored hash; keeps password comparison logic on the model rather than in the route
+- `src/routes/authRoutes.js` — Replaced the placeholder `POST /login` stub with a fully implemented endpoint:
+  - Validates that both `email` and `password` fields are present
+  - Queries the database for a user by email; returns a generic `"Invalid credentials"` message if not found (intentionally avoids confirming whether the email exists)
+  - Calls `user.comparePassword()` to verify the password; returns the same generic error on mismatch to prevent user enumeration
+  - On success, generates a JWT via generateToken and returns it alongside the user's `_id`, `username`, `email`, and `profileImage`
+
+### ⠀Testing
+- Verified the `POST /api/auth/login` endpoint in Postman with a valid request body; confirmed a successful `200` response returning a signed JWT and account info
+- Verified error handling for missing fields and invalid credentials
+
+---
+
 ## [ v0.3.1 ] – Signup Route: Bug Fixes & Postman Testing
 **Release Date:** May 16, 2026
 

@@ -78,13 +78,44 @@ router.post("/register", async (req, res) => {
     }
 });
 
+
 /**
  * @route   POST /api/auth/login
  * @desc    Authenticate user and return token
  * @access  Public
  */
 router.post("/login", async (req, res) => {
-    res.send("login");
+    try {
+        const { email, password } = req.body;
+        
+        // 1. Validation Checks
+        if (!email || !password) return res.status(400).json({ message: "All fields are required" });
+        
+        // 2. Identity Verification
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ message: "Invalid credentials" });
+        
+        // 3. Password Verification
+        const isPasswordCorrect = await user.comparePassword(password);
+        if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials" });
+        
+        // 4. Response Dispatch
+        const token = generateToken(user._id);
+        
+        res.status(200).json({
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                profileImage: user.profileImage,
+            },
+        });
+        
+    } catch (error) {
+        console.log("Error in login route:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
 
 export default router;
