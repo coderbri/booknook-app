@@ -1,5 +1,42 @@
 # BookNook – Changelog
 
+## [ v0.5.0 ] – Model Setup: Create Book Route
+**Release Date:** May 19, 2026
+
+### Overview
+Set up the book model, routes, and supporting infrastructure for book post creation. Book posts are linked to the user who created them and support image uploads via Cloudinary. Route access is restricted to authenticated users through a new middleware layer.
+
+### Cloudinary Integration
+- Created an account on [Cloudinary](https://cloudinary.com/) for cloud-based image storage
+- Added the following environment variables to `.env` using credentials from the Cloudinary dashboard (Settings > API Keys):
+
+  ```
+    CLOUDINARY_CLOUD_NAME=<cloud_name>
+    CLOUDINARY_API_KEY=<api_key>
+    CLOUDINARY_API_SECRET=<api_secret>
+  ```
+
+### Files Added
+- `src/models/Book.js` — Mongoose schema for book posts with `title`, `caption`, `image` (Cloudinary URL), and `rating` (1–5) fields; includes a user field referencing the `User` model via `ObjectId` to associate each post with its creator; timestamps enabled
+- `src/routes/bookRoutes.js` — Defines the `POST /api/books` endpoint for creating a new book post:
+  - Validates that all fields (`title`, `caption`, `rating`, `image`) are present
+  - Uploads the provided base64 image to Cloudinary and stores the returned secure URL
+  - Saves the new book document to the database with the authenticated user's ID attached via `req.user._id`
+  - Stubbed with a comment for future `READ`, `UPDATE`, and `DELETE` implementations
+- `src/lib/cloudinary.js` — Initializes and exports the Cloudinary SDK instance configured with environment variables
+- `src/middleware/auth.middleware.js` — `protectRoute` middleware that guards private routes by:
+  - Extracting the Bearer token from the `Authorization` request header
+  - Verifying the token signature against `JWT_SECRET`
+  - Fetching the corresponding user from the database (excluding the password field)
+  - Attaching the user document to `req.user` for use in downstream route handlers
+  - Returning a `401` response if the token is missing, expired, or invalid
+- `src/middleware/` — New directory created within `backend/src/` to house all Express middleware
+
+### ⠀Files Modified
+- `src/index.js` — Imported `bookRoutes` and mounted it at `/api/books`
+
+---
+
 ## [ v0.4.1 ] – Stronger JWT Secret
 **Release Date:** May 18, 2026
 
