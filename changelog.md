@@ -1,5 +1,23 @@
 # BookNook – Changelog
 
+## [ v0.4.1 ] – Stronger JWT Secret
+**Release Date:** May 18, 2026
+
+### Configuration
+- Replaced the manual `JWT_SECRET` value in `.env` with a cryptographically secure key generated via OpenSSL:
+  
+  ```bash
+  openssl rand -base64 32
+  ```
+  
+  This produces a random 32-byte string encoded in Base64, making the secret significantly harder to brute-force than a hand-written passphrase. Copy the output directly into `.env`:
+  
+  ```
+  JWT_SECRET=<generated_key>
+  ```
+
+---
+
 ## [ v0.4.0 ] – Login Route
 **Release Date:** May 18, 2026
 
