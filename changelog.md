@@ -1,5 +1,40 @@
 # BookNook – Changelog
 
+## [ v0.6.0 ] – Get Books with Pagination
+**Release Date:** May 19, 2026
+
+### Overview
+Implemented paginated retrieval for book posts to support infinite scrolling in the home feed. Rather than loading all posts at once, the endpoint fetches a controlled subset per request using query parameters — keeping API response sizes small and predictable as the dataset grows.
+
+### Pagination Logic
+The `GET /api/books` endpoint accepts two optional query parameters:
+| **Parameter** | **Default** | **Description**                   |
+|:-------------:|:-----------:|:---------------------------------:|
+| `page`        | `1`         | Which page of results to return   |
+| `limit`       | `5`         | How many books to return per page |
+
+These drive three key values inside the route:
+- `page` — The current page number parsed from the query string; determines which slice of results to return
+- `limit` — The maximum number of books returned per response; controls payload size
+- `skip` — Calculated as `(page - 1) * limit`; tells MongoDB how many documents to skip before returning results (e.g. page 2 with a limit of 5 skips the first 5 documents)
+- `.populate("user", "username profileImage")` — Replaces the raw `ObjectId` stored in the book's user `field` with the actual `username` and `profileImage` values from the referenced `User` document, so the client receives full creator details without a separate request
+
+Example request for page 2 with 5 results per page:
+```
+GET http://localhost:3000/api/books?page=2&limit=5
+```
+
+### Files Modified
+- `src/routes/bookRoutes.js` — Added the `GET /api/books` endpoint:
+  - Reads `page` and `limit` from query params (defaults: `1` and `5`)
+  - Calculates `skip` offset for MongoDB cursor positioning
+  - Queries the `Book` collection sorted by `createdAt` descending (newest first), with pagination applied via `.skip()` and `.limit()`
+  - Populates the `user` field with `username` and `profileImage` from the `User` collection
+  - Returns the books array alongside `currentPage`, `totalBooks`, and `totalPages` metadata for the client to manage infinite scroll state
+  - Updated file description comment to reflect paginated retrieval
+
+---
+
 ## [ v0.5.0 ] – Model Setup: Create Book Route
 **Release Date:** May 19, 2026
 
