@@ -1,5 +1,24 @@
 # BookNook – Changelog
 
+## [ v0.7.0 ] – Delete Book Route, Get Books by User & API Completion
+**Release Date:** May 26, 2026
+
+### Overview
+Completed the backend API by adding the remaining book routes and enabling CORS middleware. The server now supports the full set of operations needed by the mobile client: create, read (paginated + by user), and delete.
+
+### Files Modified
+- `src/routes/bookRoutes.js` — Added two new endpoints and updated the file description comment:
+  - `GET /api/books/user` — Retrieves all book posts created exclusively by the currently authenticated user; filters the `Book` collection by `req.user._id` and sorts results by `createdAt` descending so the user's most recent recommendations appear first on their profile page
+  - `DELETE /api/books/:id` — Owner-enforced deletion with Cloudinary asset cleanup:
+    1. Looks up the book by the `:id` route parameter; returns `404` if not found
+    2. Compares the book's `user` field against req.user._id as strings; returns `401` if they don't match, ensuring users can only delete their own posts
+    3. If the stored image URL contains `"cloudinary"`, extracts the public asset ID by parsing the URL path (everything after the last `/`, minus the file extension) and calls `cloudinary.uploader.destroy()` to remove the asset from cloud storage; Cloudinary cleanup errors are caught separately so a storage failure doesn't block the database deletion
+    4. Calls `book.deleteOne()` to remove the document and returns a success message
+  
+- `src/index.js` — Imported `cors` and added `app.use(cors())` middleware before the route mounts; allows the React Native client to make cross-origin requests to the API without being blocked by the browser's same-origin policy
+
+---
+
 ## [ v0.6.0 ] – Get Books with Pagination
 **Release Date:** May 19, 2026
 
