@@ -1,5 +1,35 @@
 # BookNook – Changelog
 
+## [ v0.8.0 ] – React Native & Expo Environment Setup
+**Release Date:** June 5, 2026
+
+### Overview
+Initialized the mobile application inside the `mobile/` directory and configured the Expo development environment. Boilerplate was stripped down and the assets directory was prepped with the foundational resources needed for frontend development.
+
+### Setup
+- Initialized a new Expo project in the `mobile/` directory using the latest template:
+  ```bash
+  npx create-expo-app@latest .
+  ```
+
+- Removed Expo boilerplate to start from a clean slate:
+  ```bash
+  npm run reset-project
+  ```
+  
+- Started the Expo development server to confirm the environment is running:
+  ```bash
+  npx expo
+  ```
+⠀
+### Assets Preparation
+- Populated the `assets/` directory with the following resources needed for the UI build:
+  - `fonts/` — Custom typefaces to be loaded via Expo's font utilities
+  - `images/` — Static image assets (icons, placeholders, etc.)
+  - `styles/` — Shared base styles to be referenced across screens and components
+
+---
+
 ## [ v0.7.0 ] – Delete Book Route, Get Books by User & API Completion
 **Release Date:** May 26, 2026
 
