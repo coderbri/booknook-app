@@ -1,5 +1,24 @@
 # BookNook – Changelog
 
+## [ v0.9.0 ] – Root Layout Setup
+**Release Date:** June 9, 2026
+
+### Overview
+Established the root navigation structure for the mobile app using Expo Router's file-based routing. Created the auth route group with placeholder login and signup screens, and introduced a shared safe area wrapper component used across all screens.
+
+### Files Added
+- `app/_layout.jsx` — Root layout wrapping the entire app in `SafeAreaProvider` and `SafeScreen`; defines a `Stack` navigator with headers hidden globally and registers the `index` and `(auth)` screens
+- `app/index.jsx `— Temporary root screen used during development to verify navigation is wired up correctly; contains `Link` components pointing to the login and signup routes
+- `app/(auth)/_layout.jsx` — Layout for the auth route group; renders a `Stack` navigator with headers hidden so login and signup screens display without a nav bar
+- `app/(auth)/index.jsx` — Login screen placeholder; renders a minimal `View` with a `Text` label to confirm the route resolves correctly
+- `app/(auth)/signup.jsx` — Signup screen placeholder; same minimal structure as the login screen, to be built out in a future session
+- `components/SafeScreen.jsx` — Reusable wrapper component that applies safe area insets to prevent UI content from rendering behind device notches or system bars
+
+### ⠀Bug Fix
+- Corrected a naming typo in the `colors.js` constants file
+
+---
+
 ## [ v0.8.0 ] – React Native & Expo Environment Setup
 **Release Date:** June 5, 2026
 
