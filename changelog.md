@@ -1,5 +1,24 @@
 # BookNook – Changelog
 
+## [ v0.10.0 ] – Login Screen Design
+**Release Date:** June 12, 2026
+
+### Overview
+Built out the UI for the login screen with a fully designed authentication form. The screen handles email and password input, password visibility toggling, loading state feedback, and keyboard-aware layout adjustments.
+
+### Files Modified
+- `app/(auth)/index.jsx` — Replaced the placeholder `Login` component with a fully implemented login screen UI:
+  - Wrapped in `KeyboardAvoidingView` with platform-specific behavior ("padding" on iOS, "height" on Android) so the form shifts up and stays visible when the keyboard opens
+  - Renders a top illustration using a local image asset with `resizeMode="contain"` to keep it proportional across screen sizes
+  - **Email field** — `TextInput` with `keyboardType="email-address"` and `autoCapitalize="none"`; decorated with a `mail-outline` Ionicon on the left via the `inputIcon` style
+  - **Password field** — `TextInput` with `secureTextEntry` toggled by `showPassword` state; includes a `lock-closed-outline` icon on the left and a `TouchableOpacity` eye icon on the right that switches between `eye-outline` and `eye-off-outline` based on visibility state
+  - **Login button** — Calls `handleLogin` on press; renders an `ActivityIndicator` in place of the button label while `isLoading` is `true`, and is set to `disabled` during that state to prevent duplicate submissions
+  - **Footer** — Navigation link to the signup screen using Expo Router's Link component with `asChild` to wrap a `TouchableOpacity` as the pressable target
+  - State managed via four `useState` hooks: `email`, `password`, `showPassword`, and `isLoading`
+  - Styles imported from `assets/styles/login.styles`; icon colors and placeholder text sourced from the `COLORS` constants file
+
+---
+
 ## [ v0.9.0 ] – Root Layout Setup
 **Release Date:** June 9, 2026
 
