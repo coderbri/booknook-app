@@ -1,5 +1,28 @@
 # BookNook – Changelog
 
+## [ v0.11.0 ] – Signup Screen Design
+**Release Date:** June 12, 2026
+
+### Overview
+Built out the UI for the signup screen with a fully designed registration form. Structure and behavior mirrors the login screen with the addition of a username field and a distinct header section.
+
+### Files Modified
+- `app/(auth)/signup.jsx` — Replaced the placeholder `Signup` component with a fully implemented signup screen UI:
+  - Wrapped in `KeyboardAvoidingView` with the same platform-specific behavior as the login screen
+  - **Header** — Displays the app name (`BookWorm🐛`) and a subtitle (`Share your favorite reads`) above the form card
+  - **Username field** — `TextInput` with `autoCapitalize="none"` and a `person-outline` Ionicon on the left
+  - **Email field** — `TextInput` with `keyboardType="email-address"` and a mail-outline Ionicon on the left
+  - **Password field** — `TextInput` with `secureTextEntry` toggled by `showPassword` state; same lock icon and eye toggle pattern as the login screen
+  - **Sign Up button** — Calls `handleSignUp` on press; renders an `ActivityIndicator` while `isLoading` is `true` and is disabled during that state
+  - **Footer** — Navigates back to the login screen via `router.back()` using the `useRouter` hook rather than a `Link`, since login is the previous route in the stack
+  - State managed via five `useState` hooks: `username`, `email`, `password`, `showPassword`, and `isLoading`
+  - Styles imported from `assets/styles/signup.styles`
+
+### Up Next
+`handleSignUp` calls `register(username, email, password)` which is not yet defined — same pattern as the `login()` placeholder in the login screen. Both auth functions will be wired up to the API in the next session.
+
+---
+
 ## [ v0.10.0 ] – Login Screen Design
 **Release Date:** June 12, 2026
 
