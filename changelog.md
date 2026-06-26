@@ -1,5 +1,44 @@
 # BookNook – Changelog
 
+## [ v0.12.0 ] – Implementing Signup
+**Release Date:** June 26, 2026
+
+### Overview
+Connected the signup screen to the backend by introducing Zustand for global auth state management. The previous `register()` placeholder is now fully implemented, persisting sessions locally via AsyncStorage and exposing `user`, `token`, and `isLoading` to any component in the app.
+
+### Setup
+- Installed Zustand in the mobile/ directory:
+```bash
+npm i zustand
+```
+
+- Installed AsyncStorage for local session persistence:
+```bash
+npm i @react-native-async-storage/async-storage
+```
+
+- Running the app now requires two terminal windows: `npm run dev` in `backend/` and `npx expo` in `mobile/`
+
+### Files Added
+- `store/authStore.js` — Zustand store centralizing all authentication state and logic:
+  - State — `user`, `token`, `isLoading`, and `isCheckingAuth`
+  - `register(username, email, password)` — Posts credentials to `POST` `/auth/register`, persists the returned `user` and `token` to AsyncStorage, and updates global state; returns `{ success, error? }` so calling components can branch on the result
+  - login(email, password) — Same flow as register, posting to POST /auth/login
+  - checkAuth() — Reads token and user from AsyncStorage on app startup to re-hydrate an existing session; sets isCheckingAuth to false once complete
+  - logout() — Clears token and user from both AsyncStorage and global state
+- constants/api.js — Exports API_URL, currently pointed at `http://localhost:3000/api`
+
+### Files Modified
+- `app/(auth)/signup.jsx` — Connected the screen to the new store:
+  - Replaced the local `isLoading` state with the value pulled from `useAuthStore`
+  - Replaced the placeholder `register()` call in `handleSignUp` with the real `register` action from the store
+  - Added temporary `console.log(user)` and `console.log(token)` statements to verify state updates after a successful signup
+
+### Note
+- `API_URL` is hardcoded to `localhost`, which will only work when testing on a simulator/emulator running on the same machine as the backend — a physical device will need the machine's local network IP instead
+
+---
+
 ## [ v0.11.0 ] – Signup Screen Design
 **Release Date:** June 12, 2026
 

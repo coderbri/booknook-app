@@ -1,3 +1,8 @@
+/**
+ * @file Signup.jsx
+ * @description Authentication screen providing a user registration form 
+ * coupled directly with global Zustand action bindings for backend profile provisioning.
+ */
 import {
     View,
     Text,
@@ -7,75 +12,97 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Alert,
-  } from "react-native";
-  import styles from "../../assets/styles/signup.styles";
-  import { Ionicons } from "@expo/vector-icons";
-  import COLORS from "../../constants/colors";
-  import { useState } from "react";
-  import { useRouter } from "expo-router";
-  
-  export default function Signup() {
+} from "react-native";
+import styles from "../../assets/styles/signup.styles";
+import { Ionicons } from "@expo/vector-icons";
+import COLORS from "../../constants/colors";
+import { useState } from "react";
+import { useRouter } from "expo-router";
+import { useAuthStore } from "../../store/authStore";
+
+/**
+ * Signup Screen Component
+ * Intercepts visual registration field entry data and bridges tracking hooks with our active store.
+ */
+export default function Signup() {
+    // ==========================================
+    // 1. Local Component States
+    // ==========================================
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     
-    const [isLoading, setIsLoading] = useState(false);
-    
+    // ==========================================
+    // 2. Global State Store Selections
+    // ==========================================
+    const { user, isLoading, register, token } = useAuthStore();
     const router = useRouter();
     
+    // ==========================================
+    // 3. Action Logic Handlers
+    // ==========================================
+    /**
+     * Accesses custom Zustand actions to attempt profile generation via standard credentials.
+     */
     const handleSignUp = async () => {
         const result = await register(username, email, password);
         
         if (!result.success) Alert.alert("Error", result.error);
     };
     
+    console.log(user);
+    console.log(token);
+    
+    // ==========================================
+    // 4. UI Rendering
+    // ==========================================
     return (
-    <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
         <View style={styles.container}>
-        <View style={styles.card}>
+            <View style={styles.card}>
             {/* HEADER */}
             <View style={styles.header}>
-            <Text style={styles.title}>BookWorm🐛</Text>
-            <Text style={styles.subtitle}>Share your favorite reads</Text>
+                <Text style={styles.title}>BookWorm🐛</Text>
+                <Text style={styles.subtitle}>Share your favorite reads</Text>
             </View>
-
+            
             <View style={styles.formContainer}>
-            {/* USERNAME INPUT */}
-            <View style={styles.inputGroup}>
+                {/* USERNAME INPUT */}
+                <View style={styles.inputGroup}>
                 <Text style={styles.label}>Username</Text>
                 <View style={styles.inputContainer}>
-                <Ionicons
+                    <Ionicons
                     name="person-outline"
                     size={20}
                     color={COLORS.primary}
                     style={styles.inputIcon}
-                />
-                <TextInput
+                    />
+                    <TextInput
                     style={styles.input}
                     placeholder="johndoe"
                     placeholderTextColor={COLORS.placeholderText}
                     value={username}
                     onChangeText={setUsername}
                     autoCapitalize="none"
-                />
+                    />
                 </View>
-            </View>
-
-            {/* EMAIL INPUT */}
-            <View style={styles.inputGroup}>
+                </View>
+                
+                {/* EMAIL INPUT */}
+                <View style={styles.inputGroup}>
                 <Text style={styles.label}>Email</Text>
                 <View style={styles.inputContainer}>
-                <Ionicons
+                    <Ionicons
                     name="mail-outline"
                     size={20}
                     color={COLORS.primary}
                     style={styles.inputIcon}
-                />
-                <TextInput
+                    />
+                    <TextInput
                     style={styles.input}
                     placeholder="johndoe@gmail.com"
                     value={email}
@@ -83,60 +110,64 @@ import {
                     onChangeText={setEmail}
                     keyboardType="email-address"
                     autoCapitalize="none"
-                />
+                    />
                 </View>
-            </View>
-
-            {/* PASSWORD INPUT */}
-            <View style={styles.inputGroup}>
+                </View>
+                
+                {/* PASSWORD INPUT */}
+                <View style={styles.inputGroup}>
                 <Text style={styles.label}>Password</Text>
                 <View style={styles.inputContainer}>
-                <Ionicons
+                    <Ionicons
                     name="lock-closed-outline"
                     size={20}
                     color={COLORS.primary}
                     style={styles.inputIcon}
-                />
-                <TextInput
+                    />
+                    <TextInput
                     style={styles.input}
                     placeholder="******"
                     placeholderTextColor={COLORS.placeholderText}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
-                />
-                <TouchableOpacity
+                    />
+                    <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     style={styles.eyeIcon}
-                >
+                    >
                     <Ionicons
-                    name={showPassword ? "eye-outline" : "eye-off-outline"}
-                    size={20}
-                    color={COLORS.primary}
+                        name={showPassword ? "eye-outline" : "eye-off-outline"}
+                        size={20}
+                        color={COLORS.primary}
                     />
+                    </TouchableOpacity>
+                </View>
+                </View>
+                
+                {/* SIGNUP BUTTON */}
+                <TouchableOpacity
+                style={styles.button}
+                onPress={handleSignUp}
+                disabled={isLoading}
+                >
+                {isLoading ? (
+                    <ActivityIndicator color="#fff" />
+                ) : (
+                    <Text style={styles.buttonText}>Sign Up</Text>
+                )}
+                </TouchableOpacity>
+
+                {/* FOOTER */}
+                <View style={styles.footer}>
+                <Text style={styles.footerText}>Already have an account?</Text>
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Text style={styles.link}>Login</Text>
                 </TouchableOpacity>
                 </View>
             </View>
-
-            {/* SIGNUP BUTTON */}
-            <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={isLoading}>
-                {isLoading ? (
-                <ActivityIndicator color="#fff" />
-                ) : (
-                <Text style={styles.buttonText}>Sign Up</Text>
-                )}
-            </TouchableOpacity>
-
-            {/* FOOTER */}
-            <View style={styles.footer}>
-                <Text style={styles.footerText}>Already have an account?</Text>
-                <TouchableOpacity onPress={() => router.back()}>
-                <Text style={styles.link}>Login</Text>
-                </TouchableOpacity>
-            </View>
             </View>
         </View>
-        </View>
-    </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
     );
 }
