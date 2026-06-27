@@ -1,5 +1,29 @@
 # BookNook – Changelog
 
+## [ v0.13.0 ] – Deploying Our API
+**Release Date:** June 27, 2026
+
+### Overview
+Deployed the backend API to ~[Render](https://render.com/)~ so it can be reached over the internet instead of only on `localhost`, enabling testing from both the simulator and a physical mobile device.
+### Deployment
+- Connected the GitHub repo to a new Render web service and deployed the `backend/` directory
+- First deploy crashed post-build with a `MongooseServerSelectionError` — Render's outbound IPs weren't on the Atlas allowlist
+- **Bug fix:** Updated MongoDB Atlas Network Access to allow connections from anywhere (`0.0.0.0/0`), since Render's IPs aren't static; redeployed and confirmed a successful database connection in the logs
+
+### Files Modified
+- `store/authStore.js` — Temporarily hardcoded the `register` action's fetch call to the production Render URL (`https://booknook-app.onrender.com/api/auth/register`) in place of the dynamic `API_URL` import, so the deployed API can be reached from a physical device on the same network without relying on the machine's local IP
+
+### Testing
+- Verified validation error handling still works correctly against the deployed API (missing fields, invalid input)
+- Verified successful registration end-to-end: user data persists correctly to MongoDB Atlas via the live Render deployment
+- **Pending:** full registration test on a physical mobile device (in progress)
+- No post-registration navigation exists yet, so a successful signup currently has no follow-up screen to land on
+
+### Up Next
+Swap the hardcoded Render URL in `authStore.js` back to the dynamic `API_URL`, with logic to switch between local and production endpoints depending on environment, once device testing is confirmed working.
+
+---
+
 ## [ v0.12.0 ] – Implementing Signup
 **Release Date:** June 26, 2026
 
@@ -14,7 +38,7 @@ npm i zustand
 
 - Installed AsyncStorage for local session persistence:
 ```bash
-npm i @react-native-async-storage/async-storage
+npx expo install @react-native-async-storage/async-storage
 ```
 
 - Running the app now requires two terminal windows: `npm run dev` in `backend/` and `npx expo` in `mobile/`
