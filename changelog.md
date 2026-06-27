@@ -1,5 +1,49 @@
 # BookNook – Changelog
 
+## [ v0.14.0 ] – Learning & Implementing CRON Jobs
+**Release Date:** June 27, 2026
+
+### Overview
+Render's free tier spins the server down after 15 minutes of inactivity, causing a noticeable delay (~30–60s) on the next request while it spins back up. To avoid this, set up a cron job that pings the API every 14 minutes — just under the idle threshold — keeping the server continuously warm.
+
+### What is a Cron Job?
+A cron job is a scheduled task that runs automatically at fixed intervals. Schedules are defined using a cron expression made up of five fields:
+
+```
+MINUTE   HOUR   DAY_OF_MONTH   MONTH   DAY_OF_WEEK
+```
+
+A few reference examples:
+| **Expression** | **Runs** |
+|:-:|:-:|
+| */14 * * * * | Every 14 minutes |
+| 0 * * * * | At the top of every hour |
+| 0 0 * * 0 | Midnight every Sunday |
+| 30 3 15 * * | 3:30 AM on the 15th of each month |
+| 0 0 1 1 * | Midnight on January 1st |
+
+### Setup
+* Installed the `cron` package in `backend/`:
+
+```bash
+npm i cron
+```
+* Added `API_URL` (the live Render URL) as an environment variable both locally in `.env` and as an environment variable on Render's dashboard, so the cron job has a consistent target to ping in both environments
+
+### Files Added
+* `src/lib/cron.js` — Defines a `CronJob` scheduled with the expression `*/14 * * * *`, firing every 14 minutes:
+  * Sends an HTTPS `GET` request to `process.env.API_URL` using Node's built-in `https` module
+  * Logs a success message on a `200` response, or the status code on failure
+  * Logs an error if the request itself fails to dispatch (e.g. network issue)
+
+### Files Modified
+* `src/index.js` — Imported the `job` instance from `cron.js` and called `job.start()` before the middleware setup, so the keep-alive polling begins as soon as the server starts
+
+### Deployment Note
+This change only takes effect once committed and pushed to the repo — Render needs to redeploy with the updated code (and the `API_URL` environment variable set) for the cron job to actually run in production.
+
+---
+
 ## [ v0.13.0 ] – Deploying Our API
 **Release Date:** June 27, 2026
 
