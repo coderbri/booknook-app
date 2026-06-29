@@ -1,5 +1,30 @@
 # BookNook – Changelog
 
+## [ v0.15.0 ] – Login/Logout & CheckAuth
+**Release Date:** June 29, 2026
+
+### Overview
+Wired up the remaining auth store actions (`login`, `logout`, and `checkAuth`) to the app and validated the full authentication cycle using a temporary debug UI on the root index screen. The login screen was also connected to the Zustand store, replacing its previous local loading state placeholder.
+
+### Files Modified
+- **`store/authStore.js`** — Reverted the hardcoded Render URL in `register` back to `localhost:3000` to continue simulator testing without consuming the production API; same change applied to the `login` action for consistency
+- **`app/index.jsx`** — Expanded the temporary root screen into a minimal auth state debugger:
+  - Imports `user`, `token`, `checkAuth`, and logout from useAuthStore
+  - Calls `checkAuth()` inside a `useEffect` on mount to re-hydrate any existing session from AsyncStorage on startup
+  - Displays `user.username` and the raw `token` string conditionally — if no session exists, both fields render empty, confirming the user is logged out
+  - Renders a `TouchableOpacity` wired to `logout`, which clears both values from AsyncStorage and resets global state; used to simulate a logout without a dedicated screen
+  - Retains the `Link` shortcuts to `/signup` and `/(auth)` for manual navigation during testing
+  - Added a `console.log((user, token))` debug statement to log state together for quick verification during phone testing
+- **`app/(auth)/index.jsx`** — Connected the login screen to the Zustand store:
+  - Replaced the local `isLoading` `useState` hook with `isLoading` pulled from `useAuthStore`
+  - Imported and wired up the `login` action from `useAuthStore`, replacing the previous placeholder call in `handleLogin`
+  - The login button's `disabled` prop and `ActivityIndicator` now both respond to the store's `isLoading` flag rather than local state
+
+### Up Next
+Next session will focus on implementing auto-navigation so the app redirects to the appropriate screen after login or signup, and setting up a tab navigator so authenticated users no longer land on the auth screens.
+
+---
+
 ## [ v0.14.0 ] – Learning & Implementing CRON Jobs
 **Release Date:** June 27, 2026
 

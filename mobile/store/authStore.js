@@ -35,7 +35,7 @@ export const useAuthStore = create((set) => ({
             // to support over-the-air testing via physical mobile devices.
             
             // const response = await fetch(`${API_URL}/auth/register`, {
-            const response = await fetch("https://booknook-app.onrender.com/api/auth/register", {
+            const response = await fetch("http://localhost:3000/api/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export const useAuthStore = create((set) => ({
         
         try {
             // 1. Backend Sync
-            const response = await fetch(`${API_URL}/auth/login`, {
+            const response = await fetch("http://localhost:3000/api/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -1,5 +1,5 @@
 /**
- * @file Login.jsx
+ * @file index.jsx (Login Page)
  * @description Authentication screen providing a user login form 
  * with field handling, password visibility toggling, and layout adjustment.
  */
@@ -20,21 +20,27 @@ import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 
+import { useAuthStore } from "../../store/authStore";
+
 /**
  * Login Screen Component
  * Renders the interface for authenticating existing users into the app.
  */
 export default function Login() {
-    // 1. State Hooks
+    // 1. State Hooks (Local Inputs & Global Store)
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); // Manages visibility toggle state mask
     
-    // 2. Event Handlers
+    // Wire up shared async actions and loading flags from the global Zustand store
+    const { isLoading, login } = useAuthStore();
+    
+    // 2. Action Logic Event Handlers
+    // Binds credential state values directly to the centralized login action handler.
     const handleLogin = async () => {
         const result = await login(email, password);
         
+        // Render system alert window if the store returns a failure flag from the API
         if (!result.success) Alert.alert("Error", result.error);
     };
     
