@@ -1,5 +1,42 @@
 # BookNook – Changelog
 
+## [ v0.16.0 ] – Auto Navigation & Tabs Setup
+**Release Date:** June 30, 2026
+
+### Overview
+Removed the temporary debug root screen and replaced it with real auth-aware routing: unauthenticated users are redirected to the login screen, and authenticated users land in a new tabbed home interface. Three placeholder tab screens (Home, Create, Profile) were scaffolded to support upcoming feature work.
+
+### Auto-Navigation Logic
+The root layout now drives navigation based on auth state rather than relying on manual `Link` taps:
+- **`useSegments()`** returns the current route's path segments as an array (e.g. `["(auth)"]`), letting the layout determine which route group the user is currently in
+- On mount, `checkAuth()` re-hydrates any existing session from AsyncStorage, just as in v0.15.0
+- A second `useEffect` watches `user`, `token`, and `segments`, and redirects accordingly:
+  - If there's no signed-in user and the current route isn't already in `(auth)`, redirect to `/(auth)`
+  - If the user is signed in but still sitting in `(auth)`, redirect to `/(tabs)`
+- This pattern means the app self-corrects to the right screen any time auth state changes, rather than requiring the user to navigate manually after logging in or out
+  
+### Files Added
+- **`app/(tabs)/_layout.jsx`** — Tab navigator layout using Expo Router's `Tabs`:
+  - Applies themed colors from the `COLORS` constants file and hides per-screen headers
+  - Uses `useSafeAreaInsets()` to pad the tab bar height for the device's bottom safe area (notch/home indicator)
+  - Registers three tabs — **Home**, **Create**, and **Profile** — each with an `Ionicons` icon (`home-outline`, `add-circle-outline`, `person-outline`)
+- **`app/(tabs)/index.jsx`** — Placeholder Home tab screen
+- **`app/(tabs)/create.jsx`** — Placeholder Create tab screen
+- **`app/(tabs)/profile.jsx`** — Placeholder Profile tab screen
+
+### Files Modified
+- **`app/_layout.jsx`** — Replaced the static `Stack.Screen` list with auth-driven routing:
+  - Added `useRouter` and `useSegments` from Expo Router
+  - Pulled `checkAuth`, `user`, and `token` from `useAuthStore`
+  - Registered `(tabs)` as a stack screen alongside `(auth)`
+  - Added a `StatusBar` component with `style="dark"`
+  - Removed the old root `index` route from the stack, since unauthenticated and authenticated users are now routed directly to `(auth)` or `(tabs)` instead of landing on a temporary home screen
+
+### Removed
+- **`app/index.jsx`** — The temporary debug root screen from v0.15.0 (username/token display and manual logout button) was removed now that real navigation and a tabbed home screen are in place
+
+---
+
 ## [ v0.15.0 ] – Login/Logout & CheckAuth
 **Release Date:** June 29, 2026
 
