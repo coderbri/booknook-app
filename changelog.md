@@ -1,5 +1,39 @@
 # BookNook – Changelog
 
+## [ v0.17.0 ] – Building Create Screen UI Design
+**Release Date:** July 7, 2026
+
+### Overview
+Built out the UI and UX for the Create tab screen, where users will compose and submit new book recommendations. All form fields and interactions are in place; the submission handler is stubbed and will be implemented in the next session.
+### Packages Installed
+* **`expo-image-picker`** — Provides access to the device's native media library and camera roll; used to let users select a photo for their book post
+  
+  ```bash
+  npx expo install expo-image-picker
+  ```
+
+* **`expo-file-system`** — Gives access to the local file system on the device; used as a fallback to manually read an image file as a Base64 string when the image picker doesn't return Base64 data directly
+
+  ```bash
+  npx expo install expo-file-system
+  ```
+
+### What is Base64?
+Images can't be sent directly over the internet as binary files in a JSON request body, so they need to be encoded as text first. Base64 is an encoding format that converts binary data (like an image) into a plain-text string, which can then be included in a JSON payload and transmitted to the backend. The server (in this case, Cloudinary) decodes that string back into an image on receipt.
+
+### Files Modified
+* **`app/(tabs)/create.jsx`** — Replaced the placeholder Create `screen` with a full form UI:
+  * **State** — Six `useState` hooks: `title`, `caption`, `rating` (default `3`), `image` (local URI for display), `imageBase64` (encoded string for network transmission), and `loading`
+  * **`pickImage()`** — Requests media library permission on device (skipped on web); launches the native image library with editing enabled, a 4:3 aspect ratio, and 0.5 quality compression to keep the Base64 payload size manageable; stores the local URI in `image` for preview and the Base64 string in `imageBase64` for submission; falls back to `expo-file-system` to manually encode the URI if the picker doesn't provide Base64 directly
+  * **`renderRatingPicker()`** — Renders a row of five tappable `Ionicons` stars; stars at or below the current `rating` value render as filled (`star`), others render as outlined (`star-outline`); tapping any star updates the rating state to that index
+  * **`handleSubmit()`** — Stubbed; submission logic to be implemented in the next session
+  * **Layout** — Wrapped in `KeyboardAvoidingView` (platform-specific behavior) and `ScrollView` so the form remains accessible when the keyboard is open; includes a header, book title field, star rating picker, image picker with preview, multiline caption field, and a Share button with an upload icon and `ActivityIndicator` for loading state
+
+### Up Next
+Implement `handleSubmit` to send `title`, `caption`, `rating`, and `imageBase64` to `POST /api/books` via the Zustand store or a direct fetch call.
+
+---
+
 ## [ v0.16.0 ] – Auto Navigation & Tabs Setup
 **Release Date:** June 30, 2026
 
