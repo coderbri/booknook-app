@@ -1,5 +1,32 @@
 # BookNook – Changelog
 
+## [ v0.18.0 ] – Completing Create Screen
+**Release Date:** June 10, 2026
+
+### Overview
+Completed the Create screen by implementing `handleSubmit` logic, fixing a payload size error on the backend, and cleaning up the auth store to consistently use the `API_URL` environment variable across all fetch calls.
+
+### Bug Fix
+* **`backend/src/index.js`** — Expanded the Express JSON body parser limit from the default 100KB to `10mb` to accommodate incoming Base64-encoded image payloads; without this, submitting a post with an image was throwing a `PayloadTooLargeError` before the request could reach the route handler
+
+### ⠀Files Modified
+
+- **`app/(tabs)/create.jsx`** — Implemented the previously stubbed `handleSubmit` function:
+  - Added client-side validation to ensure all fields (`title`, `caption`, `imageBase64`, `rating`) are filled before making a network request
+  - Parses the local image URI's file extension to determine the correct MIME type (e.g. `image/jpeg`), defaulting to `image/jpeg` if detection fails
+  - Assembles a Data URL string (`data:<mimeType>;base64,<imageBase64>`) so the Cloudinary uploader can correctly parse the image type on receipt
+  - Posts to `POST /api/books` with the JWT from `useAuthStore` attached in the `Authorization` header as a Bearer token
+  - Converts `rating` to a string before sending, as the backend schema expects a string for nested model parsing
+  - On success, shows a confirmation alert, resets all form fields back to their defaults, and navigates the user to the home tab via `router.push("/")`
+  - On failure, displays the error message from the API response
+  - `setLoading` is called in a `finally` block to guarantee the loading state clears regardless of outcome
+  - Added `const { token } = useAuthStore()` to retrieve the active session token for request authorization
+  - Added `console.log(token)` for debug verification during testing
+
+- **`store/authStore.js`** — Removed all hardcoded `localhost` URLs; both `register` and `login` now consistently resolve their fetch targets through the `API_URL` constant imported from `constants/api.js`, so the same store works across local simulator testing and production without manual URL swapping
+
+---
+
 ## [ v0.17.0 ] – Building Create Screen UI Design
 **Release Date:** July 7, 2026
 

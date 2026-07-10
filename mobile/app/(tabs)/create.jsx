@@ -34,6 +34,9 @@ export default function Create() {
     const [loading, setLoading] = useState(false);
     
     const router = useRouter();
+    const { token } = useAuthStore(); // Retrieves active session token to authorize downstream network requests
+    
+    console.log(token);
     
     const pickImage = async () => {
         /**
@@ -58,7 +61,7 @@ export default function Create() {
                 aspect: [4, 3],
                 quality: 0.5, // lower quality for smaller base64 representation
                 base64: true,
-            })
+            });
             
             if (!result.canceled) {
                 // console.log("result is here: ", result); 
@@ -82,7 +85,65 @@ export default function Create() {
         }
     };
     
-    const handleSubmit = async () => {};
+    
+    /** Async Form Dispatch Handler
+     * Validates fields, wraps the asset string into a standard Data URL layout,
+     * and posts the final payload payload to the protected backend book controller.
+     */
+    const handleSubmit = async () => {
+        // 1. Client-Side Validation Guard Clause
+        if (!title || !caption || !imageBase64 || !rating) {
+            Alert.alert("Error", "Please fill in all fields");
+            return;
+        }
+        
+        try {
+            setLoading(true); // Enters loading state to trigger the global overlay ActivityIndicator spinner
+            
+            // 2. Mime-Type Parsing Resolution
+            // Parses the local filename string to determine the true image extension name
+            const uriParts = image.split(".");
+            const fileType = uriParts[uriParts.length - 1];
+            const imageType = fileType ? `image/${fileType.toLowerCase()}` : "image/jpeg";
+            
+            // 3. Data URL Data Assembly
+            // Combines explicit MIME headers with the raw base64 data so target upload engines parse it correctly
+            const imageDataUrl = `data:${imageType};base64,${imageBase64}`;
+            
+            // 4. Secure Network Dispatch
+            const response = await fetch(`${API_URL}/books`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`, // Pass the JWT signature inside request headers
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title,
+                    caption,
+                    rating: rating.toString(), // Express backend requires string structures for nested schema models
+                    image: imageDataUrl,       // Large payload string parsed through json channel
+                }),
+            });
+            
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Something went wrong");
+            
+            // 5. Success Operations & Local State Reset
+            Alert.alert("Success", "Your book recommendation has been posted!");
+            setTitle("");
+            setCaption("");
+            setRating(3);
+            setImage(null);
+            setImageBase64(null);
+            router.push("/"); // navigate user to homepage
+            
+        } catch (error) {
+            console.error("Error creating post:", error);
+            Alert.alert("Error", error.message || "Something went wrong");
+        } finally {
+            setLoading(false); // Clean up load states regardless of submission outcome
+        }
+    };
     
     const renderRatingPicker = () => {
         /**

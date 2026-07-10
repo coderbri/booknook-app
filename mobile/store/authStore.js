@@ -31,11 +31,9 @@ export const useAuthStore = create((set) => ({
         set({ isLoading: true });
         try {
             // 1. Backend Sync
-            // NOTE: Swapping dynamic API_URL for explicit production Render link 
-            // to support over-the-air testing via physical mobile devices.
-            
-            // const response = await fetch(`${API_URL}/auth/register`, {
-            const response = await fetch("http://localhost:3000/api/auth/register", {
+            // Dynamically resolves target environments via central API_URL instead of hardcoded addresses,
+            // tracking cleanly over local networks or staging links.
+            const response = await fetch(`${API_URL}/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +74,8 @@ export const useAuthStore = create((set) => ({
         
         try {
             // 1. Backend Sync
-            const response = await fetch("http://localhost:3000/api/auth/login", {
+            // Standardized to match variables configured across constant asset scopes
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
