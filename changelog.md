@@ -1,5 +1,41 @@
 # BookNook – Changelog
 
+## [ v0.19.0 ] – Building Home Screen
+**Release Date:** June 12, 2026
+
+### Overview
+Built out the Home tab screen into a fully functional paginated feed. Users can now browse book recommendations posted by the community, pull to refresh, and trigger infinite scroll to load more results. Supporting utilities and a reusable loader component were also created.
+
+### Files Added
+- **`lib/utils.js`** — General-purpose date formatting helpers:
+  - **`formatMemberSince(dateString)`** — Converts a MongoDB ISO timestamp into a short `"Mon YYYY"` label (e.g. `"Jul 2026"`); used for profile display
+  - **`formatPublishDate(dateString)`** — Converts a MongoDB ISO timestamp into a fully localized long-form string (e.g. `"July 11, 2026"`); used on each book card's "Shared on" date line
+- **`components/Loader.jsx`** — Reusable full-screen loading indicator component; rendered during initial data fetch before the book list is populated
+
+### Files Modified
+- **`app/(tabs)/index.jsx`** — Replaced the placeholder Home screen with a full feed implementation:
+  - **State** — Six hooks: token (from `useAuthStore`), `books`, `loading`, `refreshing`, `page`, and `hasMore`
+  - **`fetchBooks(pageNum, refresh)`** — Core async data pipeline:
+    - Appends `page` and `limit=2` as query parameters to `GET /api/books`, with the JWT passed in the `Authorization` header
+    - On refresh (`refresh=true`), resets the list to the first page's results; on subsequent pages, merges incoming books with the existing list using a deduplication filter — builds a `Set` of unique `_id` values from the combined array and maps back to the full book objects, eliminating any duplicates that might appear from rapid pagination actions
+    - Updates `hasMore` by comparing `pageNum` against `data.totalPages`
+    - On refresh, applies an 800ms throttle delay before clearing `refreshing` to keep the pull-to-refresh animation visually smooth
+  - **`handleLoadMore()`** — Triggers `fetchBooks(page + 1)` when the `FlatList` reaches 10% from the bottom, gated by `hasMore`, `loading`, and `refreshing` flags to prevent duplicate requests
+  - **`renderItem({ item })`** — Maps each book document to a card layout displaying the creator's avatar, username, book cover image (via `expo-image` for caching), title, star rating row, caption, and formatted publish date
+  - **`renderRatingStars(rating)`** — Renders a row of up to 5 `Ionicons` stars, filled or outlined based on the book's rating value
+  - **`FlatList`** **configuration**:
+    - `refreshControl` — Pull-to-refresh wired to `fetchBooks(1, true)`
+    - `onEndReached / onEndReachedThreshold={0.1}` — Infinite scroll trigger
+    - `ListHeaderComponent` — App name and subtitle rendered above the feed
+    - `ListFooterComponent` — Small `ActivityIndicator` shown while more pages are loading
+    - `ListEmptyComponent` — Empty state with an icon and prompt to post the first recommendation
+
+### Note
+- `sleep(800)` is called inside the refresh `finally` block but is not yet imported or defined — this will throw a `ReferenceError` at runtime when a pull-to-refresh is triggered. A sleep utility (e.g. `const sleep = (ms) => new Promise(r => setTimeout(r, ms))`) needs to be added to `utils.js` or defined locally before testing refresh behavior
+- `console.log(books)` is left in for debugging and should be removed before final release
+
+---
+
 ## [ v0.18.0 ] – Completing Create Screen
 **Release Date:** June 10, 2026
 
