@@ -1,5 +1,20 @@
 # BookNook – Changelog
 
+## [ v0.19.1 ] – Pull-To-Refresh Runtime Resolution & Content Loading Guard
+**Release Date:** June 12, 2026
+
+### Overview
+Resolved a structural runtime ReferenceError identified in the feed pagination logic by explicitly defining the asynchronous micro-timing block layout directly above the primary home component entry scope, and integrated initial lifecycle loading guards to mount full-screen loading skeleton indicators uniformly.
+
+### Files Modified
+- **`app/(tabs)/index.jsx`** — Appended local operational definition parameters for the missing `sleep` utility constructor instance and inserted a component lifecycle state validation hook.
+
+### Key Implementation Details
+- **Asynchronous Execution Throttle:** Implemented a standalone local `sleep` helper utility using a native wrapped Promise macro-task architecture (`new Promise((resolve) => setTimeout(resolve, ms))`). This provides an explicit resolution window that enables the 800ms pipeline throttle inside the pull-to-refresh `finally` clean-up wrapper block to complete successfully without throwing thread-breaking ReferenceErrors.
+- **Initial Hydration Interception Gating:** Wired an early return block that references the local `loading` state flag directly before template evaluation. This safely isolates initial data acquisition routines by substituting empty feed wireframes with the global full-screen `<Loader />` indicator element until data sets settle.
+
+---
+
 ## [ v0.19.0 ] – Building Home Screen
 **Release Date:** June 12, 2026
 

@@ -22,6 +22,15 @@ import Loader from "../../components/Loader";
  * Home Tab Screen Component
  * Renders the primary dashboard view context within the core tab navigator group.
  */
+
+/**
+ * Halts execution flow asynchronously for a specified duration.
+ * Provides a manual rendering throttle to prevent layout flickering during rapid visual transitions.
+ * @param {number} ms - The millisecond timeout window duration.
+ * @returns {Promise<void>} An unvalued operational confirmation promise.
+ */
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default function Home() {
     // 1. Pagination & Rendering Local States
     const { token } = useAuthStore();
@@ -142,6 +151,11 @@ export default function Home() {
         }
         return stars;
     };
+    
+    // 3.5 Operational Lifecycle Interception Gating
+    // Hijacks default rendering pipeline while the initial hydration fetch is active.
+    // Mounts full-screen native loading layout skeletons to hide structural layout shift anomalies.
+    if (loading) return <Loader />;
     
     console.log(books);
     
