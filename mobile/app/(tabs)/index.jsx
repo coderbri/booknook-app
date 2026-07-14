@@ -26,10 +26,11 @@ import Loader from "../../components/Loader";
 /**
  * Halts execution flow asynchronously for a specified duration.
  * Provides a manual rendering throttle to prevent layout flickering during rapid visual transitions.
+ * Exported globally so profile views and secondary screens reuse the exact same microtask setup.
  * @param {number} ms - The millisecond timeout window duration.
  * @returns {Promise<void>} An unvalued operational confirmation promise.
  */
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Home() {
     // 1. Pagination & Rendering Local States

@@ -1,5 +1,35 @@
 # BookNook – Changelog
 
+## [ v0.20.0 ] – Building Profile Screen
+**Release Date:** June 13, 2026
+
+### Overview
+Constructed the user profile screen, aggregating the authenticated user's personal book recommendations, exposing a delete flow for individual posts, and introducing dedicated header and logout components. Also patched a logout crash bug and updated the backend registration response to include `createdAt`.
+
+### Bug Fix
+- **`components/ProfileHeader.jsx`** — Added an early `if (!user) return null` guard before attempting to access `user.profileImage` and other properties; without it, a `Cannot read property 'profileImage'` of null Render Error was thrown during the brief window between logout and the root layout's navigation redirect, when `user` in the store is already `null` but the profile screen is still mounted
+
+### Files Added
+- **`components/ProfileHeader.jsx`** — Reads `user` from `useAuthStore` and renders the profile identity block: avatar image (via `expo-image`), username, email, and a formatted join date using `formatMemberSince` from `lib/utils`; includes the `if (!user) return null` render guard described above
+- **`components/LogoutButton.jsx`** — Renders a styled button that calls `confirmLogout`, which presents a native `Alert` dialog requiring the user to confirm before firing `logout()` from the auth store; uses a `"destructive"` style on the confirm action to signal the irreversibility of the session clear
+
+### Files Modified
+- **`app/(tabs)/index.jsx`** — Promoted `sleep` from a local definition to a named export (`export const sleep = ...`) so it can be imported and reused by the profile screen and any other future consumer without duplicating the implementation
+- **`app/(tabs)/profile.jsx`** — Full implementation of the Profile tab screen:
+  - **State** — `books`, `isLoading`, `refreshing`, and `deleteBookId` (tracks which post is currently being deleted to show a per-item spinner)
+  - **`fetchData()`** — Fetches the current user's posts from `GET /api/books/user` with the JWT in the `Authorization` header; sets `isLoading` before the request and clears it in `finally`
+  - **`handleDeleteBook(bookId)`** — Sends a `DELETE /api/books/:id` request; on success, filters the deleted post out of the local `books` array immediately for instant UI sync without a refetch; `deleteBookId` is set before the request and cleared in `finally` to isolate the loading spinner to just that card
+  - **`confirmDelete(bookId)`** — Wraps `handleDeleteBook` in a native `Alert` confirmation dialog before firing
+  - **`handleRefresh()`** — Pull-to-refresh wrapper: sets `refreshing`, applies a 500ms `sleep` throttle to prevent layout flicker on fast database responses, then calls `fetchData()`
+  - **`renderBookItem({ item })`** — Per-item card layout showing the book cover image, title, star rating, caption (capped at 2 lines), formatted date, and a trash icon delete button; the trash icon is replaced with an `ActivityIndicator` while that item's `deleteBookId` matches
+  - **`renderRatingStars(rating)`** — Same star rendering pattern as the Home screen, sized at 14px for the compact card layout
+  - Loader gating: returns `<Loader />` during initial load only — skipped during pull-to-refresh to avoid replacing the list with a full-screen spinner on manual refresh
+  - Empty state includes an "Add Your First Book" button that navigates to `/create`
+  - Renders `<ProfileHeader />` and `<LogoutButton />` at the top of the screen above the recommendations list
+- **`backend/src/routes/authRoutes.js`** — Updated the `POST /register` response payload to include `createdAt` from the newly saved user document, so `ProfileHeader` can display the formatted join date without a separate profile fetch
+
+---
+
 ## [ v0.19.1 ] – Pull-To-Refresh Runtime Resolution & Content Loading Guard
 **Release Date:** June 12, 2026
 
