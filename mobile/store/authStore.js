@@ -14,7 +14,7 @@ export const useAuthStore = create((set) => ({
     user: null,
     token: null,
     isLoading: false,
-    isCheckingAuth: true,
+    isCheckingAuth: true, // check for user authentication upon login
     
     // ==========================================
     // 2. State Actions / Operations

@@ -1,8 +1,3 @@
-/**
- * @file index.jsx (Login Page)
- * @description Authentication screen providing a user login form 
- * with field handling, password visibility toggling, and layout adjustment.
- */
 import {
     View,
     Text,
@@ -33,16 +28,22 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false); // Manages visibility toggle state mask
     
     // Wire up shared async actions and loading flags from the global Zustand store
-    const { isLoading, login } = useAuthStore();
+    const { isLoading, login, isCheckingAuth } = useAuthStore();
     
-    // 2. Action Logic Event Handlers
-    // Binds credential state values directly to the centralized login action handler.
+    /** 2. Action Logic Event Handlers
+     * Binds credential state values directly to the centralized login action handler. */
     const handleLogin = async () => {
         const result = await login(email, password);
         
         // Render system alert window if the store returns a failure flag from the API
         if (!result.success) Alert.alert("Error", result.error);
     };
+    
+    /** UX Patch Gating: 
+     * Prevents "flicker" layout mounts on app boot. If the store is actively verifying
+     * cached device session keys, we halt mounting to stop the login form showing temporarily. */
+    if (isCheckingAuth) return null;
+    
     
     // 3. UI Rendering
     return (

@@ -1,5 +1,24 @@
 # BookNook – Changelog
 
+## [ v0.21.0 ] – Final Touches & Project Completion
+**Release Date:** June 16, 2026
+
+### Overview
+Resolved a login screen flicker bug affecting already-authenticated users on boot, integrated a branded splash screen that holds during font and auth loading, loaded a custom typeface, and reverted the API URL back to the production Render deployment in preparation for live release.
+
+### Bug Fix
+- **`app/(auth)/index.jsx`** — Added an early return that renders `null` while `isCheckingAuth` is `true`; previously, the login form would briefly flash on screen for already-authenticated users during the window between app boot and `checkAuth()` completing — the early return blocks the form from mounting at all until the session check settles, eliminating the flicker entirely
+- **`store/authStore.js`** — `isCheckingAuth` was already defined in the store but was not being consumed by the login screen in previous versions; wiring it into the login component's render gate is what completes the fix
+
+### Splash Screen Integration
+- **`app.json`** — Configured the `expo-splash-screen` plugin with the app icon (`splash-icon.png`), a width of 200px, `"contain"` resize mode, and a white background; this keeps the brand logo on screen during app boot instead of showing a blank white canvas
+- **`app/_layout.jsx`** — Added `SplashScreen.preventAutoHideAsync()` at the module level to hold the splash screen open on launch; added `useFonts` from `expo-font` to asynchronously load the `JetBrainsMono-Medium` typeface; added a `useEffect` that calls `SplashScreen.hideAsync()` only once `fontsLoaded` is `true`, so the splash screen stays visible until both the custom font and the auth check have completed
+
+### Files Modified
+- **`constants/api.js`** — Reverted API_URL from `localhost` back to the live Render deployment URL for production-ready network communication
+
+---
+
 ## [ v0.20.0 ] – Building Profile Screen
 **Release Date:** June 13, 2026
 
