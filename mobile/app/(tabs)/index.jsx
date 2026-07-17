@@ -41,8 +41,7 @@ export default function Home() {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     
-    // 2. Data Acquisition Pipelines
-    /**
+    /** 2. Data Acquisition Pipelines
      * Fetches segmented data chunks from backend books resource pathways.
      * Manages query-string indexing, data deduplication, and loading states.
      * @param {number} pageNum - The data chunk page index to request.
@@ -60,9 +59,6 @@ export default function Home() {
             
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || "Failed to fetch books");
-            
-            // TODO: fix it later
-            // setBooks((prevBooks) => [...prevBooks, ...data.books]);
             
             // Deduplication Filter Process:
             // Combines and maps lists into a unique Set mapping based on database ObjectId indicators.
@@ -158,7 +154,7 @@ export default function Home() {
     // Mounts full-screen native loading layout skeletons to hide structural layout shift anomalies.
     if (loading) return <Loader />;
     
-    console.log(books);
+    // console.log(books);
     
     return (
         <View style={styles.container}>

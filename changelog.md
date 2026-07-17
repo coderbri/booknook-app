@@ -1,5 +1,13 @@
 # BookNook – Changelog
 
+## [ v0.21.1 ] – Debug Log Cleanup
+**Release Date:** July 17, 2026
+
+### Cleanup
+Removed all leftover `console.log` debug statements that were added throughout development for state verification and testing. Affected files include **`app/_layout.jsx`** (`segments` log), **`app/(tabs)/index.jsx`** (`books` log), and **`app/(auth)/signup.jsx`** (`user` and `token` logs). No logic or UI changes were made.
+
+---
+
 ## [ v0.21.0 ] – Final Touches & Project Completion
 **Release Date:** June 16, 2026
 

@@ -35,7 +35,7 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
   
-  console.log("segments: ", segments);
+  // console.log("segments: ", segments);
   
   /** 1. Storage Re-Hydration
    * Check for cached tokens on boot to determine initial auth state  */
